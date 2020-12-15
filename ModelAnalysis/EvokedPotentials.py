@@ -211,9 +211,9 @@ for layer in range(len(l_att)):
 
 
 #%% Params for the spike train extraction
-layer_idx = [25]#, 37]#34, 37]#, 25, 34]
+layer_idx = [25]
 conds = ['neutral', 'P-0_I-0_O-0.3','P-1_I-0_O-0.3','P-1_I-0_O-0', 'P-0_I-0.15_O-0', 'P-1_I-0.15_O-0','P-0_I-0.05_O-0.2', 'P-1_I-0.05_O-0.2']# 'P-1_I-0.15' 'P-1_I-0_O-0'] # Todo
-#conds = ['P-0_I-0.05_O-0.2', 'P-1_I-0.05_O-0.2']
+
 #%% Loop over the different models
 for cond in conds:
     print(cond)
