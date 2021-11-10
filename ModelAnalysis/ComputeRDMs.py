@@ -44,6 +44,8 @@ def compute_rdm(activations, method='corr'):
         raise ValueError('The specified method ' + method + 'is not implemented.')
 
     return rdm
+
+dir_path = os.path.abspath('')
 # %% Settings
 new_tracker = False
 make_selection = True
@@ -57,14 +59,11 @@ np.random.seed(3)
 # %% load in the dataset:
 setting = 'FSG_Precision_v0'
 
-path = '/mnt/Googolplex/PycharmProjects/ASN_mac/COCO/BaselinePerformance_v0'
-dataset = '1_street'  # ,'2_food']
+dataset = '1_street'
 
-img_dir_test = '/mnt/Googolplex/coco/images/' + dataset + '/val2017_single_radial/'
-dataset_test = load_pickle(
-    '/mnt/Googolplex/PycharmProjects/ASN_mac/COCO/Dataset/' + dataset + '/val2017_single_radial.pickle')
-features = load_pickle(
-    '/mnt/Googolplex/PycharmProjects/ASN_mac/COCO/Dataset/' + dataset + '/Features_single_radial.pickle')
+img_dir_test = dir_path + '/Datasets/' + dataset + '/images/val2017_single_radial/'
+dataset_test = load_pickle(dir_path + '/Datasets/' + dataset + '/val2017_single_radial.pickle')
+features = load_pickle(dir_path + '/Datasets/' + dataset + '/Features_single_radial.pickle')
 targetCentres = [features['targetCentreoM'][s] for s in np.where(features['selection_1'])[0]]
 
 images = [features['x_ids'][s] for s in np.where(features['selection_1'])[0]]
@@ -132,7 +131,7 @@ del dataset_test, features
 
 
 #%%
-tracker_path = '/mnt/Googolplex/PycharmProjects/SpatialAttention_asn/ModelAnalysis/RSA/'
+tracker_path = dir_path + '/ModelAnalysis/RSA/'
 tracker_name = 'RDMs.pkl'
 if new_tracker == True:
     tracker = {}
@@ -145,11 +144,9 @@ else:
 optimizer = 'Adam'
 optimizer_func = eval('optimizers.' + optimizer)
 lr = 1e-4
-weight_path = '/mnt/Googolplex/PycharmProjects/ASN_mac/COCO/FinetuneResnet18/Resnet_v0/' + dataset + '/weights_Adam_constant_0.0001.h5'
+weight_path = dir_path + '/ModelTraining/Finetune_coco/' + dataset + '/weights_Adam_constant_0.0001.h5'
 
-json_file = open(
-    "/mnt/Googolplex/PycharmProjects/ASN_mac/COCO/FinetuneResnet18/Resnet_v0/" + dataset + "/model.json",
-    'r')
+json_file = open(dir_path + '/ModelTraining/Finetune_coco/' + dataset + "/model.json",'r')
 
 loaded_model_json = json_file.read()
 json_file.close()
@@ -195,7 +192,7 @@ for layer in range(len(l_att)):
 #%% Params for the spike train extraction
 layer_idx = [37]
 l = 37
-conds = ['P-0_I-0.15_O-0','analog', 'neutral', 'P-1_I-0_O-0.3', 'P-0_I-0_O-0.3', 'P-1_I-0_O-0']
+conds = ['P-0_I-0.15_O-0','analog', 'neutral', 'P-0_I-0_O-0.3', 'P-0.45_I-0_O-0']
 
 rdm_path = '/mnt/Googolplex/PycharmProjects/SpatialAttention_asn/ModelAnalysis/RSA/'
 data_path = '/mnt/Googleplex2/RSA_activations/'
@@ -217,7 +214,7 @@ for cond in conds:
     else:
         # Read-out the attentional settings
         splits = cond.split('_')
-        precision_mode = bool(int(splits[0].split('-')[1]))
+        precision_mode = float(splits[0].split('-')[1])
         gain_input = float(splits[1].split('-')[1])
         gain_output = float(splits[2].split('-')[1])
 
@@ -243,16 +240,16 @@ for cond in conds:
     if 'corr' not in tracker['RDMs'][cond]:
         if cond == 'analog':
             # Obtain the analog prediction
-            #model_shortened = Model(input=modelFT.input, output=modelFT.layers[model_match[l - 1]].output)
-            l_id = 65  # 61, 65 #
+
+            l_id = 65
             model_shortened = Model(input=modelFT.input, output=modelFT.layers[l_id].output)
             activations = model_shortened.predict(x_train)
 
             rdm = compute_rdm(activations.reshape(activations.shape[0], -1))
-            #rdm_rank = rankdata(rdm)
+
 
             tracker['RDMs'][cond]['corr'] = rdm
-            #tracker['RDMs'][cond]['rank-corr'] = rdm_rank
+
 
             joblib.dump(tracker, tracker_path + tracker_name, compress=True)
 

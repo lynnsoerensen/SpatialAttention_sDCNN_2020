@@ -78,21 +78,18 @@ class ASN_2D(_Conv):
             (see [constraints](../constraints.md)).
         bias_constraint: Constraint function applied to the bias vector
             (see [constraints](../constraints.md)).
-
-        pool_mode, pool_size, pool_stride, pool_padding: If provided, this layer adds a pooling operation.
-        mf: resting threshold
-        input_layer: If true, the neuron model will expect a current instead of a spike train
-        last_layer: If true, the neuron model will give out a current instead of a spike train.
-        h_scaling: if spike trains should be scaled or not. Alternative is that the weights are pre-scaled.
-        attn_param: Has no function here, only for compatibility reasons.
     # Input shape
         5D tensor with shape:
-        `(batch, time_steps,channels, rows, cols)`
-
+        `(batch, time_steps,channels, rows, cols)` if data_format='channels_first'
+        or 5D tensor with shape:
+        `(batch, time_steps, rows, cols, channels)` if data_format='channels_last'.
     # Output shape
         5D tensor with shape:
-        `(batch, time_steps, filters, new_rows, new_cols)`
-
+        `(batch, time_steps, filters, new_rows, new_cols)` if data_format='channels_first'
+        or 5D tensor with shape:
+        `(batch, time_stepsnew_rows, new_cols, filters)` if data_format='channels_last'.
+        `rows` and `cols` values might have changed due to padding.
+    # References
 
     """
 
@@ -405,10 +402,9 @@ class ASN_2D(_Conv):
 
 #%%
 class ASN_2D_attention(_Conv):
-    """ Layer with integrated adaptive spiking neuron layer with
-    The first input has 5 dimensions (batch,time,feature1,feature2,channels), the second are two coordinates for the
-    placement of the attention field.
-    If filter & kernel_size are specified, it acts as a 2D convolutional layer, otherwise it can act as a dense layer.
+    """ Layer with integrated adaptive spiking neuron layer
+    The first input has 5 dimensions (batch,time,feature1,feature2,channels), the second is the precision_map,
+    If filter & kernel_size are specified it acts as a 2D convolutional layer.
 
     When using this layer as the first layer in a model,
     provide the keyword argument `input_shape`
@@ -466,23 +462,18 @@ class ASN_2D_attention(_Conv):
             (see [constraints](../constraints.md)).
         bias_constraint: Constraint function applied to the bias vector
             (see [constraints](../constraints.md)).
-
-        pool_mode, pool_size, pool_stride, pool_padding: If provided, this layer adds a pooling operation.
-        mf: resting threshold
-        input_layer: If true, the neuron model will expect a current instead of a spike train
-        last_layer: If true, the neuron model will give out a current instead of a spike train.
-        h_scaling: if spike trains should be scaled or not. Alternative is that the weights are pre-scaled.
-        attn_param: specified with asn.attention.atten_param.py
-
     # Input shape
         5D tensor with shape:
-        `(batch, time_steps, rows, cols, channels)`
-        2D list with shape:
-        `(batch, coordinates (2 -> row, col))
-    # Output shape
+        `(batch, time_steps,channels, rows, cols)` if data_format='channels_first'
         or 5D tensor with shape:
-        `(batch, time_stepsnew_rows, new_cols, filters)` .
-
+        `(batch, time_steps, rows, cols, channels)` if data_format='channels_last'.
+    # Output shape
+        5D tensor with shape:
+        `(batch, time_steps, filters, new_rows, new_cols)` if data_format='channels_first'
+        or 5D tensor with shape:
+        `(batch, time_stepsnew_rows, new_cols, filters)` if data_format='channels_last'.
+        `rows` and `cols` values might have changed due to padding.
+    # References
 
     """
 
@@ -759,10 +750,11 @@ class ASN_2D_attention(_Conv):
         R = attend_tf(output_shape, self.data_format, self.attn_param, Ax1=inputs[1][:,0], Ax2=inputs[1][:,1])
 
         # This can introduce a precision modulation
-        if self.attn_param['Precision'] == True:
-            self.mf_mat = self.mf - R * self.mf
+        if self.attn_param['Precision'] != 0:
+            #self.mf_mat = self.mf - R * self.mf
+            self.mf_mat = self.mf - R * self.attn_param['Precision']
             # This ensures that the sum of all mfs is 0 per feature map.
-            self.mf_mat = normalize_precisionMap(self.mf_mat, self.mf)
+            self.mf_mat = normalize_precisionMap(self.mf_mat, self.mf, lowest_precision=0)
         else:
             self.mf_mat = self.mf * tf.ones(output_shape, dtype='float32')
 
@@ -801,6 +793,7 @@ class ASN_2D_attention(_Conv):
 
 class ASN_1D(Dense):
     """ Adaptive spiking neuron class
+    This was the first version of the ASN, which only computes simple activation values.
 
     Adapted from a regular densely-connected NN layer.
     `Dense` implements the operation:
@@ -847,12 +840,6 @@ class ASN_1D(Dense):
 
         bias_constraint: Constraint function applied to the bias vector
             (see [constraints](../constraints.md)).
-
-
-        mf: resting threshold
-        input_layer: If true, the neuron model will expect a current instead of a spike train
-        last_layer: If true, the neuron model will give out a current instead of a spike train.
-        h_scaling: if spike trains should be scaled or not. Alternative is that the weights are pre-scaled.
 
         last_layer: Key command for a read-out ASN neuron
         # Input shape

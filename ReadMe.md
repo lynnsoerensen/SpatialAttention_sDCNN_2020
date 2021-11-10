@@ -7,7 +7,7 @@ This is the code that accompagnies this [paper](https://www.biorxiv.org/content/
 * the `asn` package for DCNN to sDCNN conversion with and without spatial attention 
 * a set of function (`Datasets`) to replicate the dataset curation from the [COCO database](https://cocodataset.org/#home)
 * the code to reproduce the results in the paper (`ModelTraining`, `ModelEvaluation`, `ModelAnalysis`)
-* the code to reproduce the [paper](https://www.biorxiv.org/content/10.1101/2020.12.15.422863v1) figures (`Figures`)
+* the code to reproduce the [paper](https://www.biorxiv.org/content/10.1101/2020.12.15.422863v3) figures (`Figures`)
 
 <br/>
 
@@ -26,7 +26,7 @@ Please make sure to add the right files to the `ModelEvaluation` and `ModelAnaly
 The model training scripts can be found in `ModelTraining`. The resulting weights are provided [here](https://uvaauas.figshare.com/projects/Leveraging_spiking_deep_neural_networks_to_understand_neural_mechanisms_underlying_selective_attention/94406).
 
 
-
+Last updated: 10.11.2021
 
 
 

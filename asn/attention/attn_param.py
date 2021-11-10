@@ -2,7 +2,8 @@ from asn.conversion.utils import predict_model_length
 
 def set_attn_param(layer_idx= None,
                    Ax1=None, Ax2=None, AxWidth1=None, AxWidth2=None, Apeak=2, Abase=1, Ashape='oval', exponent=None,
-                   InputGain=0, OutputGain=0, Precision=True):
+                   IxWidth=0,
+                   InputGain=0, OutputGain=0, Precision=0):
 
     """ Function to set-up attention parameter for a given layer # Todo
     :parameter
@@ -14,11 +15,12 @@ def set_attn_param(layer_idx= None,
     Apeak: peak amplitude of attention field
     Abase: baseline of attention field for unattended locations/features
     Ashape: either 'oval' or 'cross'
+    IxWidth: Width of kernel for suppressive kernel
     exponent: exponent on attention field
 
     InputGain: Incoming current will be multiplied with 1+ R*Inputgain
     OutputGain: Outgoing synaptic connections will be scaled by 1+ R*Outputgain
-    Precision: Bool. Whether to apply precision-reweighting.
+    Precision: Precision distribution will be scaled.
 
     :returns
     attn_param: dict with attentional params
@@ -37,6 +39,7 @@ def set_attn_param(layer_idx= None,
                   'Apeak': Apeak,
                   'Abase': Abase,
                   'Ashape': Ashape,
+                  'IxWidth': IxWidth,
                   'exponent': exponent,
                   'InputGain': InputGain,
                   'OutputGain': OutputGain,

@@ -1,4 +1,5 @@
 import joblib
+import os
 from scipy.stats import zscore
 import matplotlib.pyplot as plt
 from scipy.optimize import nnls
@@ -68,11 +69,10 @@ def estimateCorr(tracker, cond, num_draws=100, onset=100, path=None):
             counter = 0
 
 
-
+dir_path = os.path.abspath('')
 no_cpu = multiprocessing.cpu_count()
-out_path = '/mnt/Googolplex/PycharmProjects/SpatialAttention_asn/ModelAnalysis/RSA/'
+out_path = dir_path + '/ModelAnalysis/RDMFits/'
 
-#tracker = joblib.load(out_path + 'RDMs_110620.pkl')
 tracker = joblib.load(out_path + 'RDMs.pkl')
 
 # make categorical RDM
@@ -82,19 +82,15 @@ for cat in range(len(tracker['categories'])):
     cat_rdm[cat * num_img: (cat+1) * num_img, cat * num_img: (cat+1) * num_img] = 0
 
 
-#analog_rdm = squareform(rankdata(tracker['RDMs']['analog']['corr']))
-#analog_rdm = squareform(tracker['RDMs']['analog']['corr'])
-
 onset = 100
 
 tracker['RDMs']['category'] = squareform(cat_rdm)
 
 conds = ['neutral', 'P-0_I-0.15_O-0 - valid', 'P-0_I-0.15_O-0 - invalid',
          'P-0_I-0_O-0.3 - valid', 'P-0_I-0_O-0.3 - invalid',
-         'P-1_I-0_O-0 - valid', 'P-1_I-0_O-0 - invalid']
+         'P-0.45_I-0_O-0 - valid', 'P-0.45_I-0_O-0 - invalid']
 
 Parallel(n_jobs=no_cpu-1)(delayed(estimateCorr)(tracker,cond, num_draws=500,
                                                 path=out_path, onset=onset) for cond in conds)
-
 
 
