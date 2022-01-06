@@ -3,11 +3,11 @@ by Lynn K.A. Sörensen, Davide Zambrano, Heleen A. Slagter, Sander M. Bohté, & 
 
 
 ### Overview
-This is the code that accompagnies this [paper](https://www.biorxiv.org/content/10.1101/2020.12.15.422863v1) and consists of three parts:
+This is the code that accompagnies this [paper](https://www.biorxiv.org/content/10.1101/2020.12.15.422863v4) and consists of three parts:
 * the `asn` package for DCNN to sDCNN conversion with and without spatial attention 
 * a set of function (`Datasets`) to replicate the dataset curation from the [COCO database](https://cocodataset.org/#home)
 * the code to reproduce the results in the paper (`ModelTraining`, `ModelEvaluation`, `ModelAnalysis`)
-* the code to reproduce the [paper](https://www.biorxiv.org/content/10.1101/2020.12.15.422863v3) figures (`Figures`)
+* the code to reproduce the [paper](https://www.biorxiv.org/content/10.1101/2020.12.15.422863v4) figures (`Figures`)
 
 <br/>
 
