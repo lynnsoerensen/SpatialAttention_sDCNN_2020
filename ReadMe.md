@@ -1,4 +1,4 @@
-# Leveraging spiking deep neural networks to understand neural mechanisms underlying selective attention
+# Leveraging spiking deep neural networks to understand the neural mechanisms underlying selective attention
 by Lynn K.A. Sörensen, Davide Zambrano, Heleen A. Slagter, Sander M. Bohté, & H. Steven Scholte
 
 
